@@ -25,7 +25,8 @@ import {
   Search,
   ShoppingCart,
   X,
-  Trash2
+  Trash2,
+  Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -33,10 +34,22 @@ import { GoogleGenAI } from "@google/genai";
 // AI initialization removed from top level to avoid API key error at startup
 // Only initialize if needed inside specific functions
 
-const DynamicItem = ({ image, title }: { image: string, title: string }) => (
-  <div className="min-w-[120px] bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
+const DynamicItem = ({ image, title, date, likes, onClick }: { image: string, title: string, date?: string, likes?: number, onClick?: () => void, key?: any }) => (
+  <div 
+    onClick={onClick}
+    className="min-w-[120px] bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0 cursor-pointer active:scale-95 transition-transform"
+  >
     <img src={image} alt={title} className="w-full h-24 object-cover" referrerPolicy="no-referrer" />
-    <p className="p-2 text-[10px] text-gray-700 font-medium line-clamp-1">{title}</p>
+    <div className="p-2">
+      <p className="text-[10px] text-gray-700 font-bold line-clamp-1">{title}</p>
+      <div className="flex items-center justify-between mt-1">
+        <span className="text-[8px] text-gray-400">{date}</span>
+        <div className="flex items-center gap-0.5 text-[8px] text-gray-400">
+          <Heart className="w-2 h-2" />
+          <span>{likes ?? 0}</span>
+        </div>
+      </div>
+    </div>
   </div>
 );
 
@@ -99,7 +112,7 @@ const RateForm = ({ name }: { name: string }) => {
         ))}
       </div>
       <textarea 
-        placeholder={`写下您对${name}的评价吧...`}
+        placeholder={`写下您对${name}评价吧...`}
         className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs outline-none focus:border-blue-300 transition-colors resize-none h-20"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
@@ -124,6 +137,61 @@ const RouteItem = ({ image, title, price }: { image: string, title: string, pric
     </div>
   </div>
 );
+
+const dynamics = [
+  {
+    id: 'd1',
+    title: '金海雪山春日漫游',
+    date: '4月30日',
+    likes: 128,
+    images: [
+      'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?auto=format&fit=crop&q=80&w=600'
+    ],
+    content: `金海雪山春日漫游🌼宫崎骏动漫世界照进现实
+贵定金海雪山也太美了
+油菜花的「金海」配漫山酥李花的「雪山」
+真的可以感受一万次贵州的春和景明
+花海骑行🚲吹着春风超惬意，花野市集逛吃打卡
+还有花田音乐会🎼，边听歌边赏花海，幸福感爆棚
+📸【绝美打卡机位&游玩体验】
+▫️花海中的巨型相框+艺术门
+站在里面拍超出片，画面超治愈❤️🩹
+▫️花海观景台（油菜花田外山坡上）
+俯瞰整片金色花海，🚂小火车经过简直动漫感十足
+还可以花海骑行🚲路过这里拍动态感拉满[色色R]
+▫️翁城河旁
+这里可以体验竹筏🚣拍油菜花和竹筏同框照🌼
+▫️花海小火车
+穿梭在金色花田，随手拍都是日系清新大片`
+  },
+  {
+    id: 'd2',
+    title: '西江千户苗寨夜景',
+    date: '4月28日',
+    likes: 356,
+    isVideo: true,
+    images: ['https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?auto=format&fit=crop&q=80&w=600'],
+    content: '西江千户苗寨，万家灯火。漫步在吊脚楼间，听风看云，赏苗家风情。'
+  },
+  {
+    id: 'd3',
+    title: '梵净山云海奇观',
+    date: '4月25日',
+    likes: 212,
+    images: ['https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&q=80&w=600'],
+    content: '梵净山，天空之城。在这里感受大自然的鬼斧神工，洗涤心灵。'
+  },
+  {
+    id: 'd4',
+    title: '荔波小七孔自然风光',
+    date: '4月20日',
+    likes: 452,
+    images: ['https://images.unsplash.com/photo-1549693578-d683be217e58?auto=format&fit=crop&q=80&w=600'],
+    content: '荔波小七孔，地球腰带上的绿宝石。清澈见底的湖水，如诗如画。'
+  }
+];
 
 const products = [
   { 
@@ -150,8 +218,11 @@ export default function App() {
   const [chatHistory, setChatHistory] = useState<{type: 'user' | 'bot', content: string | React.ReactNode}[]>([]);
   
   // New States
-  const [secondaryPage, setSecondaryPage] = useState<'none' | 'service_list' | 'product_detail' | 'cart' | 'checkout' | 'success'>('none');
+  const [secondaryPage, setSecondaryPage] = useState<'none' | 'service_list' | 'product_detail' | 'cart' | 'checkout' | 'success' | 'dynamics_list' | 'dynamic_detail'>('none');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedDynamic, setSelectedDynamic] = useState<any>(null);
+  const [floatingNote, setFloatingNote] = useState<any>(null);
+  const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const [cart, setCart] = useState<any[]>([]);
   const [companyInfo, setCompanyInfo] = useState<string>('');
   const [loadingCompany, setLoadingCompany] = useState(false);
@@ -197,7 +268,7 @@ export default function App() {
     setTimeout(() => {
       setChatHistory(prev => [...prev, { 
         type: 'bot', 
-        content: "精彩旅程规划中。。。🚀" 
+        content: "精彩旅程规划中...🚀" 
       }]);
       setIsPlanning(true);
 
@@ -223,8 +294,8 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <button 
-                onClick={() => window.location.href = 'tel:13800138000'}
+                <button 
+                  onClick={() => window.location.href = 'tel:18585866935'}
                 className="w-full py-2 bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm"
               >
                 电话详谈规划细节
@@ -322,7 +393,7 @@ const handleCompanyClick = () => {
               <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
                 <p className="text-[11px] text-blue-700 mb-2 font-medium">💡 提示：价格包含导游及行程规划费。如需定制私人行程，欢迎直接拨打我的电话详谈！</p>
                 <a 
-                  href="tel:13800138000" 
+                  href="tel:18585866935" 
                   className="flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-transform"
                 >
                   <Phone className="w-3.5 h-3.5" />
@@ -451,7 +522,7 @@ const handleCompanyClick = () => {
             referrerPolicy="no-referrer"
           />
           <div className="bg-white text-gray-700 px-4 py-2 rounded-2xl rounded-tl-none shadow-sm border border-gray-50 max-w-[85%] leading-relaxed text-sm">
-            你好！我是中国国旅 (贵州) 国际旅行社有限公司，行程规划师大明。欢迎来到多彩贵州！关于旅行规划的任何小疑问，我都超乐意为您解答呢！
+            你好！我是中国国旅 (贵州) 国际旅行社有限公司行程规划师大明。欢迎来到多彩贵州！咱们计划玩个几天呀，我根据您的时间安排来介绍最舒服的游玩路线，现在咱们刚好有活动价格非常优惠~
           </div>
         </div>
 
@@ -464,7 +535,7 @@ const handleCompanyClick = () => {
               className="flex items-start gap-2"
             >
               <img 
-                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" 
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" 
                 alt="Mini Avatar" 
                 className="w-8 h-8 rounded-full object-cover shrink-0"
                 referrerPolicy="no-referrer"
@@ -472,25 +543,30 @@ const handleCompanyClick = () => {
               <div className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-50 max-w-[85%]">
                 <div className="flex items-center justify-between mb-0.5">
                   <span className="text-sm font-bold text-gray-800">精彩动态</span>
-                  <button className="flex items-center text-[10px] text-blue-500">
+                  <button 
+                    onClick={() => setSecondaryPage('dynamics_list')}
+                    className="flex items-center text-[10px] text-blue-500"
+                  >
                     <span>更多</span>
                     <ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
                 <p className="text-[10px] text-gray-500 mb-2">这是我为您精选的贵州必打卡美景，每一处都值得您亲自去感受。</p>
                 <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                  <DynamicItem 
-                    image="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=400" 
-                    title="感受春天的气息" 
-                  />
-                  <DynamicItem 
-                    image="https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?auto=format&fit=crop&q=80&w=400" 
-                    title="西江千户苗寨夜景" 
-                  />
-                  <DynamicItem 
-                    image="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&q=80&w=400" 
-                    title="梵净山云海奇观" 
-                  />
+                  {dynamics.map(item => (
+                    <DynamicItem 
+                      key={item.id}
+                      image={item.images[0]} 
+                      title={item.title} 
+                      date={item.date}
+                      likes={item.likes}
+                      onClick={() => {
+                        setSelectedDynamic(item);
+                        setCurrentImgIndex(0);
+                        setSecondaryPage('dynamic_detail');
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -618,7 +694,7 @@ const handleCompanyClick = () => {
             className="flex items-start gap-2"
           >
             <img 
-              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" 
+              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" 
               alt="Mini Avatar" 
               className="w-8 h-8 rounded-full object-cover shrink-0"
               referrerPolicy="no-referrer"
@@ -632,7 +708,7 @@ const handleCompanyClick = () => {
                 </div>
                 <p className="text-[11px] text-gray-600 mb-3">您可以随时拨打我的电话，大明将为您提供最专业的贵州旅行建议。</p>
                 <a 
-                  href="tel:13800138000" 
+                  href="tel:18585866935" 
                   className="flex items-center justify-center gap-2 bg-blue-500 text-white py-2 rounded-xl text-xs font-bold shadow-sm active:scale-95 transition-transform"
                 >
                   <Phone className="w-3.5 h-3.5" />
@@ -780,6 +856,58 @@ const handleCompanyClick = () => {
 
       {/* Bottom Bar */}
       <div className="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-100 px-4 pt-3 pb-6 z-50">
+        {/* Floating Note above input */}
+        <AnimatePresence>
+          {floatingNote && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-3 flex items-center gap-3"
+            >
+              <img src={floatingNote.images[0]} className="w-12 h-12 rounded-lg object-cover" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-gray-800">刚刚浏览的笔记</p>
+                <p className="text-[10px] text-gray-400 truncate">{floatingNote.title} | {floatingNote.content.substring(0, 20)}...</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => {
+                    const noteContent = `我对这个动态很感兴趣：${floatingNote.title}`;
+                    setChatHistory(prev => [...prev, { type: 'user', content: noteContent }]);
+                    setFloatingNote(null);
+                    
+                    // Bot response
+                    setTimeout(() => {
+                      setChatHistory(prev => [...prev, { 
+                        type: 'bot', 
+                        content: (
+                          <div className="space-y-3">
+                            <p>金海雪山真的很美，花都绽放开了，特别适合5月份游玩，可以联系我，详细给你介绍哦。</p>
+                            <button 
+                              onClick={() => window.location.href = 'tel:18585866935'}
+                              className="mt-2 flex items-center justify-center gap-2 bg-blue-500 text-white text-[11px] px-4 py-2 rounded-lg active:scale-95 transition-all shadow-sm"
+                            >
+                              <Phone className="w-3 h-3" />
+                              <span>联系我</span>
+                            </button>
+                          </div>
+                        )
+                      }]);
+                    }, 800);
+                  }}
+                  className="bg-pink-50 text-pink-500 px-3 py-1.5 rounded-full text-[10px] font-bold active:scale-95 transition-transform"
+                >
+                  发送
+                </button>
+                <button onClick={() => setFloatingNote(null)} className="p-1">
+                  <X className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar py-1">
           <button 
             onClick={() => triggerCard('contact')}
@@ -843,10 +971,16 @@ const handleCompanyClick = () => {
                   if (secondaryPage === 'product_detail') {
                     if (selectedProduct?.isCustom) setSecondaryPage('none');
                     else setSecondaryPage('service_list');
+                    setSelectedProduct(null);
                   }
                   else if (secondaryPage === 'checkout') setSecondaryPage('product_detail');
                   else if (secondaryPage === 'success') setSecondaryPage('none');
-                  else setSecondaryPage('none');
+                  else if (secondaryPage === 'dynamic_detail') {
+                    setSecondaryPage(selectedDynamic?.fromList ? 'dynamics_list' : 'none');
+                  }
+                  else {
+                    setSecondaryPage('none');
+                  }
                 }} 
                 className="p-1"
               >
@@ -858,6 +992,8 @@ const handleCompanyClick = () => {
                 {secondaryPage === 'cart' && '购物车'}
                 {secondaryPage === 'checkout' && '确认订单'}
                 {secondaryPage === 'success' && '支付成功'}
+                {secondaryPage === 'dynamics_list' && '精彩动态'}
+                {secondaryPage === 'dynamic_detail' && '动态详情'}
               </h2>
               <div className="w-8" />
             </div>
@@ -1112,6 +1248,194 @@ const handleCompanyClick = () => {
                       </div>
                     </>
                   )}
+                </div>
+              )}
+
+              {secondaryPage === 'dynamics_list' && (
+                <div className="absolute inset-0 flex flex-col bg-[#F7F8FA] overflow-y-auto no-scrollbar">
+                  <div className="p-4 space-y-4">
+                    {/* Top Business Card */}
+                    <div className="bg-[#1C1F26] rounded-3xl p-5 shadow-xl relative overflow-hidden mb-5">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent blur-2xl" />
+                      <div className="flex gap-4 items-center">
+                        <div className="relative">
+                          <img 
+                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150" 
+                            className="w-16 h-16 rounded-3xl object-cover border-2 border-white/10" 
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-lg">地陪</div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-bold text-white">李大明</h3>
+                            <div className="flex items-center gap-1 bg-green-500/10 text-green-400 px-2 py-0.5 rounded-md text-[10px] border border-green-500/20">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                              <span>已实名</span>
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-gray-400 mb-2">中国国旅 (贵州) 国际旅行社有限公司</p>
+                          <div className="flex items-center gap-1.5 text-gray-300 pointer-events-auto" onClick={(e) => { e.stopPropagation(); window.location.href = 'tel:18585866935'; }}>
+                            <Phone className="w-3 h-3 text-blue-400" />
+                            <span className="text-xs font-medium">18585866935</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="w-1.5 h-4 bg-blue-500 rounded-full"></div>
+                      <h3 className="text-sm font-bold text-gray-900">所有动态</h3>
+                    </div>
+
+                    {/* Waterfall Grid */}
+                    <div className="columns-2 gap-3 space-y-3 pb-20">
+                      {dynamics.map(item => (
+                        <div 
+                          key={item.id}
+                          onClick={() => {
+                            setSelectedDynamic({ ...item, fromList: true });
+                            setCurrentImgIndex(0);
+                            setSecondaryPage('dynamic_detail');
+                          }}
+                          className="break-inside-avoid bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-50 active:scale-[0.98] transition-transform"
+                        >
+                          <div className="relative">
+                            <img src={item.images[0]} alt={item.title} className="w-full h-auto object-cover" referrerPolicy="no-referrer" />
+                            {item.isVideo && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                                <div className="w-8 h-8 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50">
+                                  <motion.div 
+                                    animate={{ scale: [1, 1.1, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                    className="w-0 h-0 border-t-[5px] border-t-transparent border-l-[8px] border-l-white border-b-[5px] border-b-transparent ml-0.5"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] text-white">
+                              {item.images.length}P
+                            </div>
+                          </div>
+                          <div className="p-3">
+                            <h3 className="text-[11px] font-bold text-gray-800 mb-2 line-clamp-2 leading-snug">{item.title}</h3>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] text-gray-400">{item.date}</span>
+                              <div className="flex items-center gap-1 text-[9px] text-gray-400">
+                                <Heart className="w-3 h-3" />
+                                <span>{item.likes}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {secondaryPage === 'dynamic_detail' && selectedDynamic && (
+                <div className="absolute inset-0 flex flex-col bg-white overflow-hidden">
+                  <div className="flex-1 overflow-y-auto no-scrollbar">
+                    {/* Image Swiper */}
+                    <div className="relative h-80 group">
+                      <motion.img 
+                        key={currentImgIndex}
+                        initial={{ opacity: 0.8 }}
+                        animate={{ opacity: 1 }}
+                        src={selectedDynamic.images[currentImgIndex]} 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      
+                      {/* Image Indicators */}
+                      {selectedDynamic.images.length > 1 && (
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-md rounded-full">
+                          {selectedDynamic.images.map((_, i) => (
+                            <button 
+                              key={i}
+                              onClick={() => setCurrentImgIndex(i)}
+                              className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImgIndex ? 'bg-white w-4' : 'bg-white/50'}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Navigation Arrows */}
+                      {selectedDynamic.images.length > 1 && (
+                        <>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentImgIndex(prev => (prev > 0 ? prev - 1 : selectedDynamic.images.length - 1));
+                            }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentImgIndex(prev => (prev < selectedDynamic.images.length - 1 ? prev + 1 : 0));
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <h2 className="text-xl font-bold text-gray-900">{selectedDynamic.title}</h2>
+                      </div>
+                      
+                      <div className="bg-gray-100/30 rounded-2xl p-5 border border-gray-50 min-h-[120px] mb-2">
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                          {selectedDynamic.content}
+                        </p>
+                      </div>
+                      <div className="text-[10px] text-gray-400 font-medium">发布于 {selectedDynamic.date}</div>
+                      
+                      <div className="mt-8 flex items-center justify-between pb-24">
+                        <div className="flex -space-x-2">
+                          {[1,2,3,4].map(i => (
+                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden">
+                              <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" className="w-full h-full object-cover" />
+                            </div>
+                          ))}
+                          <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 font-bold">
+                            +{selectedDynamic.likes - 4}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Bottom Action */}
+                  <div className="p-4 border-t border-gray-100 bg-white flex items-center gap-3">
+                    <button 
+                      className="flex items-center gap-2 bg-pink-50 text-pink-500 px-6 py-4 rounded-2xl active:scale-95 transition-transform"
+                      onClick={() => {
+                        alert('感谢您的点赞！');
+                      }}
+                    >
+                      <Heart className="w-5 h-5 fill-pink-500" />
+                      <span className="text-sm font-bold">{selectedDynamic.likes}</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setFloatingNote(selectedDynamic);
+                        setSecondaryPage('none');
+                      }}
+                      className="flex-1 py-4 bg-blue-500 text-white rounded-2xl text-sm font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+                    >
+                      <span>和我聊一聊</span>
+                      <MessageSquare className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
