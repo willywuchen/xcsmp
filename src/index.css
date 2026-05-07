@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to { opacity: 0; transform: translate(-50%, -30px); }
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-out forwards;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

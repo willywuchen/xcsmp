@@ -173,7 +173,30 @@ const dynamics = [
     likes: 356,
     isVideo: true,
     images: ['https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?auto=format&fit=crop&q=80&w=600'],
-    content: '西江千户苗寨，万家灯火。漫步在吊脚楼间，听风看云，赏苗家风情。'
+    content: `西江千户苗寨的夜景确实封神
+🏮“当夜幕降临，万盏明灯亮起，这里便是神隐的世界。” 这里是《100个国内小众旅游城市》第 31 站——贵州·西江千户苗寨。
+	
+很多人说它商业化，但作为全世界最大的苗族聚居村寨，那种依山而建、层层叠叠的吊脚楼群，依然能给人巨大的视觉冲击。尤其是晚上7点半，当千户灯火瞬间亮起，满山繁星坠落，像极了《千与千寻》里的汤屋。在这里，你可以穿上一套苗族盛装，戴上银饰，做一天苗疆少女；也可以去体验最霸道的“高山流水”拦门酒。建议游玩 2天1晚。
+	
+🎒 行前必看
+心态：确实商业化，人也多，但把它当成一个成熟的“苗族文化博物馆”去逛，体验会好很多。
+交通：高铁直达“凯里南站”，出站就有直通车去景区（约50分钟）。
+住宿：这是一个巨大的坑！ 千万别带大行李箱住半山腰！青石板路+爬坡会让你怀疑人生。建议行李寄存在山脚，轻装上阵，或者住在山脚平地。
+	
+🗺️ 2天1晚·苗疆寻梦
+Day 1：高山流水与万家灯火 抵达景区北门，先体验苗族最高礼遇——十二道拦门酒。进入寨子后，穿上租来的苗服（满大街都是，一定要砍价），在风雨桥边拍照，出片率100%。傍晚坐观光车去 观景台，占据有利位置等待亮灯。当星星点点的灯光连成一片火海，那种震撼会让你忘记拥挤。
+Day 2：晨雾与烟火 早起！清晨的苗寨是最美的。晨雾缭绕在吊脚楼间，炊烟升起，褪去了夜晚的喧嚣。去逛逛 嘎歌古巷，看银饰锻造和蜡染技艺。中午去体验一次 长桌宴，虽然是表演性质，但那种“高山流水”灌酒的场面真的很有趣。
+	
+🥘 必吃清单（酸汤是灵魂）
+酸汤鱼：贵州菜的代表！红酸汤开胃，鱼肉鲜嫩，蘸着折耳根辣椒水，连喝三碗汤不夸张。
+长桌宴：主要是吃氛围，几十个人坐一桌，阿妹唱着歌来敬酒。
+黑毛猪肉串：路边摊随处可见，肉质很香。
+糯米饭：五彩斑斓的糯米饭，软糯香甜。
+	
+⚠️ 避坑Tips
+关于租衣服：货比三家！含妆造一般50-100元，记得问清楚限时不限时。
+观景台：晚上观景台回程的观光车排队极长！如果体力允许，建议走步道下山，也就15-20分钟。
+蚊虫：山区蚊虫多且毒，防蚊喷雾随身带。`
   },
   {
     id: 'd3',
@@ -230,6 +253,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('全部');
   const [remarks, setRemarks] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isContentExpanded, setIsContentExpanded] = useState(false);
 
   // AI Customizer States
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -563,6 +587,7 @@ const handleCompanyClick = () => {
                       onClick={() => {
                         setSelectedDynamic(item);
                         setCurrentImgIndex(0);
+                        setIsContentExpanded(false);
                         setSecondaryPage('dynamic_detail');
                       }}
                     />
@@ -1337,19 +1362,80 @@ const handleCompanyClick = () => {
               {secondaryPage === 'dynamic_detail' && selectedDynamic && (
                 <div className="absolute inset-0 flex flex-col bg-white overflow-hidden">
                   <div className="flex-1 overflow-y-auto no-scrollbar">
-                    {/* Image Swiper */}
-                    <div className="relative h-80 group">
-                      <motion.img 
-                        key={currentImgIndex}
-                        initial={{ opacity: 0.8 }}
-                        animate={{ opacity: 1 }}
-                        src={selectedDynamic.images[currentImgIndex]} 
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
+                    {/* Image Swiper / Video Container */}
+                    <div className={`relative ${selectedDynamic.isVideo ? 'h-[600px]' : 'h-80'} group overflow-hidden`}>
+                      {selectedDynamic.isVideo ? (
+                        <div 
+                          className="w-full h-full bg-black relative cursor-pointer"
+                          onClick={() => setIsContentExpanded(false)}
+                        >
+                          <motion.img 
+                            key={currentImgIndex}
+                            initial={{ opacity: 0.8 }}
+                            animate={{ opacity: 1 }}
+                            src={selectedDynamic.images[currentImgIndex]} 
+                            className="w-full h-full object-cover opacity-60"
+                            referrerPolicy="no-referrer"
+                          />
+                          
+                          {/* Expanded Text Overlay (Bottom Half, White Background) */}
+                          <motion.div 
+                            initial={false}
+                            animate={{ 
+                              height: isContentExpanded ? '50%' : '160px',
+                              backgroundColor: isContentExpanded ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 0)'
+                            }}
+                            className="absolute inset-x-0 bottom-0 z-20 transition-all duration-300"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {!isContentExpanded && (
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent pointer-events-none" />
+                            )}
+                            
+                            <div className={`relative z-30 p-6 h-full flex flex-col ${isContentExpanded ? 'text-gray-900' : 'text-white'}`}>
+                              <h2 className={`text-lg font-bold mb-2 leading-tight ${isContentExpanded ? 'text-gray-900' : 'text-white'}`}>
+                                {selectedDynamic.title}
+                              </h2>
+                              
+                              <div className={`flex-1 overflow-y-auto no-scrollbar`}>
+                                <p className={`text-sm leading-relaxed whitespace-pre-wrap ${!isContentExpanded ? 'line-clamp-2 text-white/90' : 'text-gray-700'}`}>
+                                  {selectedDynamic.content}
+                                </p>
+                              </div>
+
+                              <button 
+                                onClick={() => setIsContentExpanded(!isContentExpanded)}
+                                className={`mt-3 text-xs font-bold flex items-center gap-0.5 self-start px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors ${
+                                  isContentExpanded 
+                                    ? 'bg-gray-100 text-blue-600' 
+                                    : 'bg-white/10 text-blue-300'
+                                }`}
+                              >
+                                {isContentExpanded ? '点击收起' : '展开全文'}
+                                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isContentExpanded ? '-rotate-90' : 'rotate-90'}`} />
+                              </button>
+                            </div>
+                          </motion.div>
+
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
+                              <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-white border-b-[10px] border-b-transparent ml-2 opacity-50"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <motion.img 
+                          key={currentImgIndex}
+                          initial={{ opacity: 0.8 }}
+                          animate={{ opacity: 1 }}
+                          src={selectedDynamic.images[currentImgIndex]} 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      )}
                       
                       {/* Image Indicators */}
-                      {selectedDynamic.images.length > 1 && (
+                      {!isContentExpanded && selectedDynamic.images.length > 1 && (
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur-md rounded-full">
                           {selectedDynamic.images.map((_, i) => (
                             <button 
@@ -1388,42 +1474,59 @@ const handleCompanyClick = () => {
 
                     {/* Content Section */}
                     <div className="p-6">
-                      <div className="mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">{selectedDynamic.title}</h2>
-                      </div>
-                      
-                      <div className="bg-gray-100/30 rounded-2xl p-5 border border-gray-50 min-h-[120px] mb-2">
-                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                          {selectedDynamic.content}
-                        </p>
-                      </div>
-                      <div className="text-[10px] text-gray-400 font-medium">发布于 {selectedDynamic.date}</div>
-                      
-                      <div className="mt-8 flex items-center justify-between pb-24">
-                        <div className="flex -space-x-2">
-                          {[1,2,3,4].map(i => (
-                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden">
-                              <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" className="w-full h-full object-cover" />
-                            </div>
-                          ))}
-                          <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 font-bold">
-                            +{selectedDynamic.likes - 4}
+                      {!selectedDynamic.isVideo && (
+                        <>
+                          <div className="mb-4">
+                            <h2 className="text-xl font-bold text-gray-900">{selectedDynamic.title}</h2>
                           </div>
-                        </div>
+                          
+                          <div className="bg-gray-100/30 rounded-2xl p-5 border border-gray-50 mb-2 relative">
+                            <div className={`text-sm text-gray-700 leading-relaxed whitespace-pre-wrap transition-all duration-300 ${(!isContentExpanded && selectedDynamic.isVideo) ? 'line-clamp-2' : ''}`}>
+                              {selectedDynamic.content}
+                            </div>
+                            {selectedDynamic.isVideo && selectedDynamic.content.length > 50 && (
+                              <button 
+                                onClick={() => setIsContentExpanded(!isContentExpanded)}
+                                className="mt-2 text-blue-500 text-xs font-bold flex items-center gap-0.5"
+                              >
+                                {isContentExpanded ? '收起' : '展开全文'}
+                                <ChevronRight className={`w-3 h-3 transition-transform ${isContentExpanded ? '-rotate-90' : 'rotate-90'}`} />
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+                      
+                      <div className="text-[10px] text-gray-400 font-medium pt-2">发布于 {selectedDynamic.date}</div>
+                      
+                      <div className="mt-8 pb-24">
+                        {/* Removed likes list */}
                       </div>
                     </div>
                   </div>
                   
                   {/* Bottom Action */}
-                  <div className="p-4 border-t border-gray-100 bg-white flex items-center gap-3">
+                  <div className="p-4 border-t border-gray-100 bg-white flex items-center gap-3 relative pb-8">
                     <button 
-                      className="flex items-center gap-2 bg-pink-50 text-pink-500 px-6 py-4 rounded-2xl active:scale-95 transition-transform"
+                      className="flex items-center gap-2 bg-pink-50 text-pink-500 px-6 py-4 rounded-2xl active:scale-95 transition-transform relative"
                       onClick={() => {
-                        alert('感谢您的点赞！');
+                        if (selectedDynamic) {
+                          setSelectedDynamic({ ...selectedDynamic, likes: selectedDynamic.likes + 1 });
+                          
+                          // +1 animation
+                          const bubble = document.createElement('div');
+                          bubble.innerText = '+1';
+                          bubble.className = 'absolute -top-8 left-1/2 -translate-x-1/2 text-pink-500 font-bold text-sm pointer-events-none fade-out';
+                          const container = document.getElementById('like-btn-inner');
+                          if (container) container.appendChild(bubble);
+                          setTimeout(() => bubble.remove(), 1000);
+                        }
                       }}
                     >
-                      <Heart className="w-5 h-5 fill-pink-500" />
-                      <span className="text-sm font-bold">{selectedDynamic.likes}</span>
+                      <div id="like-btn-inner" className="relative flex items-center gap-2">
+                        <Heart className="w-5 h-5 fill-pink-500" />
+                        <span className="text-sm font-bold">{selectedDynamic.likes}</span>
+                      </div>
                     </button>
                     <button 
                       onClick={() => {
