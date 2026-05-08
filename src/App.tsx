@@ -259,14 +259,10 @@ export default function App() {
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [isPlanning, setIsPlanning] = useState(false);
   const [aiConfig, setAiConfig] = useState({
-    destination: '贵阳',
     duration: '3天',
-    month: '5月',
     companions: '朋友出行',
     style: '经典必去',
-    pace: '适中',
-    accommodation: '高档型',
-    others: ''
+    phoneNumber: '13984848484'
   });
 
   const servicesRef = React.useRef<HTMLDivElement>(null);
@@ -282,10 +278,24 @@ export default function App() {
   const handleAiSubmit = () => {
     setShowCustomizer(false);
     
-    // Add user message to chat
+    // Add user message to chat as a requirement card
     setChatHistory(prev => [...prev, { 
       type: 'user', 
-      content: `帮我规划一份去${aiConfig.destination}的${aiConfig.duration}行程，${aiConfig.companions}，风格偏好${aiConfig.style}。` 
+      content: (
+        <div className="bg-white/10 p-3 rounded-xl space-y-1">
+          <p className="font-bold text-xs border-b border-white/20 pb-1 mb-2">📋 行程定制需求表</p>
+          <div className="grid grid-cols-2 gap-y-2 text-[11px]">
+            <div className="text-white/60">游玩天数：</div>
+            <div>{aiConfig.duration}</div>
+            <div className="text-white/60">同行伙伴：</div>
+            <div>{aiConfig.companions}</div>
+            <div className="text-white/60">风格偏好：</div>
+            <div>{aiConfig.style}</div>
+            <div className="text-white/60">联系电话：</div>
+            <div>{aiConfig.phoneNumber}</div>
+          </div>
+        </div>
+      )
     }]);
 
     // Bot response start
@@ -319,10 +329,10 @@ export default function App() {
                 </div>
               </div>
                 <button 
-                  onClick={() => window.location.href = 'tel:18585866935'}
+                  onClick={() => window.location.href = `tel:${aiConfig.phoneNumber}`}
                 className="w-full py-2 bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm"
               >
-                电话详谈规划细节
+                拨打您的电话详谈
               </button>
             </div>
           )
@@ -615,7 +625,7 @@ const handleCompanyClick = () => {
               />
               <div className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-50 max-w-[85%]">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-sm font-bold text-gray-800">我的服务</span>
+                  <span className="text-sm font-bold text-gray-800">精选橱窗</span>
                   <button 
                     onClick={() => setSecondaryPage('service_list')}
                     className="flex items-center text-[10px] text-blue-500"
@@ -624,7 +634,7 @@ const handleCompanyClick = () => {
                     <ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
-                <p className="text-[10px] text-gray-500 mb-2">李大明为您精选贵州品质线路，以优质服务让你感受贵州大好河山，留下美好回忆。</p>
+                <p className="text-[10px] text-gray-500 mb-2">精选贵州品质线路及商品，游贵州大好河山，留美好回忆。</p>
                 <div className="flex gap-3 overflow-x-auto no-scrollbar">
                   <div className="cursor-pointer active:scale-95 transition-transform" onClick={() => openProductDetail('1')}>
                     <ProductItem 
@@ -777,7 +787,7 @@ const handleCompanyClick = () => {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <ShoppingBag className="w-4 h-4 text-orange-500" />
-                    <span className="text-sm font-bold text-gray-800">我的服务</span>
+                    <span className="text-sm font-bold text-gray-800">精选橱窗</span>
                   </div>
                   <button 
                     onClick={() => setSecondaryPage('service_list')}
@@ -787,7 +797,7 @@ const handleCompanyClick = () => {
                     <ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
-                <p className="text-[10px] text-gray-500 mb-2">旅行社精选贵州品质线路，以优质服务让你感受贵州大好河山，留下美好回忆。</p>
+                <p className="text-[10px] text-gray-500 mb-2">精选贵州品质线路及商品，游贵州大好河山，留美好回忆。</p>
                 <div className="flex gap-3 overflow-x-auto no-scrollbar">
                   <div className="cursor-pointer active:scale-95 transition-transform" onClick={() => openProductDetail('1')}>
                     <ProductItem 
@@ -878,7 +888,7 @@ const handleCompanyClick = () => {
           </motion.div>
         ))}
       </div>
-
+      
       {/* Bottom Bar */}
       <div className="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-100 px-4 pt-3 pb-6 z-50">
         {/* Floating Note above input */}
@@ -942,11 +952,11 @@ const handleCompanyClick = () => {
             <span>联系我</span>
           </button>
           <button 
-            onClick={() => triggerCard('rate_me')}
-            className="flex items-center gap-1.5 bg-white border border-green-100 text-green-600 px-4 py-1.5 rounded-xl text-xs font-bold shadow-sm active:bg-green-50 whitespace-nowrap"
+            onClick={() => setSecondaryPage('service_list')}
+            className="flex items-center gap-1.5 bg-white border border-amber-100 text-amber-600 px-4 py-1.5 rounded-xl text-xs font-bold shadow-sm active:bg-amber-50 whitespace-nowrap"
           >
-            <Star className="w-3.5 h-3.5" />
-            <span>评价我</span>
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>精选橱窗</span>
           </button>
           <button 
             onClick={() => setShowCustomizer(true)}
@@ -1012,7 +1022,7 @@ const handleCompanyClick = () => {
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <h2 className="text-sm font-bold">
-                {secondaryPage === 'service_list' && '我的服务'}
+                {secondaryPage === 'service_list' && '精选橱窗'}
                 {secondaryPage === 'product_detail' && (selectedProduct?.isCustom ? '线路详情' : '商品详情')}
                 {secondaryPage === 'cart' && '购物车'}
                 {secondaryPage === 'checkout' && '确认订单'}
@@ -1499,46 +1509,34 @@ const handleCompanyClick = () => {
                       
                       <div className="text-[10px] text-gray-400 font-medium pt-2">发布于 {selectedDynamic.date}</div>
                       
-                      <div className="mt-8 pb-24">
+                      <div className="mt-8 pb-32">
                         {/* Removed likes list */}
                       </div>
                     </div>
                   </div>
                   
-                  {/* Bottom Action */}
-                  <div className="p-4 border-t border-gray-100 bg-white flex items-center gap-3 relative pb-8">
-                    <button 
-                      className="flex items-center gap-2 bg-pink-50 text-pink-500 px-6 py-4 rounded-2xl active:scale-95 transition-transform relative"
-                      onClick={() => {
-                        if (selectedDynamic) {
-                          setSelectedDynamic({ ...selectedDynamic, likes: selectedDynamic.likes + 1 });
-                          
-                          // +1 animation
-                          const bubble = document.createElement('div');
-                          bubble.innerText = '+1';
-                          bubble.className = 'absolute -top-8 left-1/2 -translate-x-1/2 text-pink-500 font-bold text-sm pointer-events-none fade-out';
-                          const container = document.getElementById('like-btn-inner');
-                          if (container) container.appendChild(bubble);
-                          setTimeout(() => bubble.remove(), 1000);
-                        }
-                      }}
-                    >
-                      <div id="like-btn-inner" className="relative flex items-center gap-2">
-                        <Heart className="w-5 h-5 fill-pink-500" />
-                        <span className="text-sm font-bold">{selectedDynamic.likes}</span>
-                      </div>
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setFloatingNote(selectedDynamic);
-                        setSecondaryPage('none');
-                      }}
-                      className="flex-1 py-4 bg-blue-500 text-white rounded-2xl text-sm font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-                    >
-                      <span>和我聊一聊</span>
-                      <MessageSquare className="w-5 h-5" />
-                    </button>
-                  </div>
+                  {/* Floating Like Action */}
+                  <button 
+                    className="fixed right-6 bottom-10 z-[110] flex items-center gap-2 bg-white/20 backdrop-blur-md text-pink-500 px-5 py-4 rounded-3xl shadow-xl border border-white/10 active:scale-95 transition-transform"
+                    onClick={() => {
+                      if (selectedDynamic) {
+                        setSelectedDynamic({ ...selectedDynamic, likes: selectedDynamic.likes + 1 });
+                        
+                        // +1 animation
+                        const bubble = document.createElement('div');
+                        bubble.innerText = '+1';
+                        bubble.className = 'absolute -top-12 left-1/2 -translate-x-1/2 text-pink-500 font-bold text-lg pointer-events-none fade-out';
+                        const container = document.getElementById('like-btn-inner');
+                        if (container) container.appendChild(bubble);
+                        setTimeout(() => bubble.remove(), 1000);
+                      }
+                    }}
+                  >
+                    <div id="like-btn-inner" className="relative flex items-center gap-2">
+                      <Heart className="w-6 h-6 fill-pink-500" />
+                      <span className="text-sm font-bold">{selectedDynamic.likes}</span>
+                    </div>
+                  </button>
                 </div>
               )}
             </div>
@@ -1575,64 +1573,45 @@ const handleCompanyClick = () => {
                   </button>
                 </div>
 
-                <div className="space-y-4">
-                  {/* Destination */}
+                <div className="space-y-6">
+                  {/* Phone Number */}
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
                       <div className="w-1 h-3 bg-blue-500 rounded-full"></div>
-                      目的地 (中国全国省-城市)
+                      手机号
                     </label>
                     <input 
-                      type="text"
-                      placeholder="例如：云南大理、北京、贵州贵阳..."
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs outline-none focus:border-blue-300 transition-colors"
-                      value={aiConfig.destination}
-                      onChange={(e) => setAiConfig({...aiConfig, destination: e.target.value})}
+                      type="tel"
+                      placeholder="请填写您的手机号"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-sm outline-none focus:border-blue-300 transition-colors font-mono"
+                      value={aiConfig.phoneNumber}
+                      onChange={(e) => setAiConfig({...aiConfig, phoneNumber: e.target.value})}
                     />
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {['贵阳', '大理', '西安', '成都'].map(city => (
-                        <button 
-                          key={city}
-                          onClick={() => setAiConfig({...aiConfig, destination: city})}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-medium border transition-all ${aiConfig.destination === city ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-white border-gray-100 text-gray-400'}`}
-                        >
-                          {city}
-                        </button>
-                      ))}
-                    </div>
                   </div>
 
-                  {/* Duration & Month */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-800">游玩天数</label>
-                      <select 
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs outline-none"
-                        value={aiConfig.duration}
-                        onChange={(e) => setAiConfig({...aiConfig, duration: e.target.value})}
-                      >
-                        {[1,2,3,4,5,6,7].map(d => (
-                          <option key={d} value={`${d}天`}>{d}天</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-800">出行月份</label>
-                      <select 
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs outline-none"
-                        value={aiConfig.month}
-                        onChange={(e) => setAiConfig({...aiConfig, month: e.target.value})}
-                      >
-                        {[4,5,6,7,8,9,10,11,12].map(m => (
-                          <option key={m} value={`${m}月`}>{m}月</option>
-                        ))}
-                      </select>
-                    </div>
+                  {/* Duration */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                      <div className="w-1 h-3 bg-blue-500 rounded-full"></div>
+                      游玩天数
+                    </label>
+                    <select 
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs outline-none"
+                      value={aiConfig.duration}
+                      onChange={(e) => setAiConfig({...aiConfig, duration: e.target.value})}
+                    >
+                      {[1,2,3,4,5,6,7].map(d => (
+                        <option key={d} value={`${d}天`}>{d}天</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Companions */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-800">通行伙伴</label>
+                    <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                      <div className="w-1 h-3 bg-blue-500 rounded-full"></div>
+                      通行伙伴
+                    </label>
                     <div className="flex flex-wrap gap-2">
                       {['独自出行', '家庭出行', '情侣出行', '朋友出行', '老人出行'].map(opt => (
                         <button 
@@ -1648,7 +1627,10 @@ const handleCompanyClick = () => {
 
                   {/* Style */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-800">风格偏好</label>
+                    <label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                      <div className="w-1 h-3 bg-blue-500 rounded-full"></div>
+                      风格偏好
+                    </label>
                     <div className="flex flex-wrap gap-2">
                       {['文化体验', '经典必去', '自然风光', '城市景观', '历史古迹'].map(opt => (
                         <button 
@@ -1660,47 +1642,6 @@ const handleCompanyClick = () => {
                         </button>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Pace & Accommodation */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-800">行程节奏</label>
-                      <div className="flex gap-2">
-                        {['紧凑', '适中', '宽松'].map(opt => (
-                          <button 
-                            key={opt}
-                            onClick={() => setAiConfig({...aiConfig, pace: opt})}
-                            className={`flex-1 py-2 rounded-xl text-[10px] font-medium border transition-all ${aiConfig.pace === opt ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-gray-100 text-gray-500'}`}
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-800">住宿偏好</label>
-                      <select 
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 text-xs outline-none"
-                        value={aiConfig.accommodation}
-                        onChange={(e) => setAiConfig({...aiConfig, accommodation: e.target.value})}
-                      >
-                       <option value="舒适型">舒适型</option>
-                       <option value="高档型">高档型</option>
-                       <option value="豪华型">豪华型</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Others */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-800">其他需求</label>
-                    <textarea 
-                      placeholder="如：带两岁宝宝、想拍民族服装写真等..."
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-xs outline-none focus:border-blue-300 transition-colors h-24 resize-none"
-                      value={aiConfig.others}
-                      onChange={(e) => setAiConfig({...aiConfig, others: e.target.value})}
-                    />
                   </div>
 
                   <button 
