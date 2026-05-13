@@ -230,7 +230,15 @@ const products = [
   { id: '4', name: '马尾绣耳环', price: '¥128', category: '手工艺品', image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&q=80&w=400', description: '指尖上的非遗，精美水族马尾绣工艺。' },
   { id: '5', name: '蜡染桌布', price: '¥88', category: '手工艺品', image: 'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&q=80&w=400', description: '传统苗族蜡染，自然植物染色。' },
   { id: '6', name: '贵州三宝', price: '¥299', category: '特色食品', image: 'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=400', description: '天麻、杜仲、灵芝，贵州地道滋补佳品。' },
-  { id: '101', name: '【AI定制】贵州深度游', price: '¥2599', category: '定制线路', image: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&q=80&w=400', description: '这是AI根据您的需求为您量身定制的专属行程。涵盖了您偏好的所有目的地和游玩风格。' }
+  { 
+    id: '102', 
+    name: '专属线路定制服务', 
+    price: '¥1', 
+    category: '定制线路', 
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=400', 
+    description: '本商品为定制预订金。购买后将由旅行社资深定制师与您深度沟通需求，为您量身打造专属贵州旅游行程方案，包含详细的路线编排、高标住宿及用车建议。'
+  },
+  { id: '101', name: '【AI定制】贵州深度游', price: '¥2599', category: '定制线路', image: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&q=80&w=400', description: '这是AI根据您的需求为您量身定制的专属行程。涵盖了您偏好的所有目的地和游玩风格。', isCustom: true }
 ];
 
 export default function App() {
@@ -262,7 +270,7 @@ export default function App() {
     duration: '3天',
     companions: '朋友出行',
     style: '经典必去',
-    phoneNumber: '13984848484'
+    phoneNumber: '18585866935'
   });
 
   const servicesRef = React.useRef<HTMLDivElement>(null);
@@ -302,11 +310,11 @@ export default function App() {
     setTimeout(() => {
       setChatHistory(prev => [...prev, { 
         type: 'bot', 
-        content: "精彩旅程规划中...🚀" 
+        content: "正在为您查位并通知定制师大明...🚀" 
       }]);
       setIsPlanning(true);
 
-      // Final recommendation after 5s
+      // Final recommendation after 3s (shortened for better UX)
       setTimeout(() => {
         setIsPlanning(false);
         const aiProduct = products.find(p => p.id === '101');
@@ -314,25 +322,45 @@ export default function App() {
           type: 'bot', 
           content: (
             <div className="space-y-3">
-              <p>✨ 规划完成！根据您的偏好，大明为您特别推荐以下专属定制路线：</p>
+              <div className="space-y-2">
+                <p className="text-[#333] font-medium">✨ 需求已送达！大明正在为您深度核算行程...</p>
+                <p className="text-[12px] text-gray-500 leading-relaxed">
+                  您的特色需求已由定制师大明接收。在为您细化专属方案前，您可以先参考这份<span className="font-bold text-blue-600">匹配度约 80%</span> 的高品质经典路线。
+                </p>
+              </div>
+              
               <div 
-                className="cursor-pointer active:scale-95 transition-transform" 
+                className="cursor-pointer active:scale-[0.98] transition-transform" 
                 onClick={() => openProductDetail('101')}
               >
-                <div className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm">
-                  <img src={aiProduct?.image} className="w-full h-32 object-cover" />
+                <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                  <div className="relative">
+                    <img src={aiProduct?.image} className="w-full h-36 object-cover" />
+                    <div className="absolute top-2 left-2 bg-blue-600/90 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
+                      80% 匹配方案
+                    </div>
+                  </div>
                   <div className="p-3">
-                    <p className="text-sm font-bold text-gray-800">{aiProduct?.name}</p>
-                    <p className="text-base font-bold text-orange-500 mt-1">{aiProduct?.price}</p>
-                    <p className="text-[10px] text-gray-400 mt-2">包含专属AI路线规划详情，支持在线预订。</p>
+                    <p className="text-sm font-bold text-gray-800 line-clamp-1">{aiProduct?.name}</p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-base font-black text-orange-500">{aiProduct?.price}</p>
+                      <p className="text-[10px] text-gray-400">查看详情</p>
+                    </div>
                   </div>
                 </div>
               </div>
-                <button 
-                  onClick={() => window.location.href = `tel:${aiConfig.phoneNumber}`}
-                className="w-full py-2 bg-blue-500 text-white rounded-xl text-xs font-bold shadow-sm"
+
+              <div className="bg-blue-50/50 rounded-xl p-3 border border-blue-100/50">
+                <p className="text-[11px] text-blue-800 leading-relaxed italic">
+                  💡 定制师温馨提示：我们会根据您填写的偏好（{aiConfig.duration}、{aiConfig.style}）尽快与您联系，为您微调行程细节，请注意接听 {aiConfig.phoneNumber.slice(0,3)}****{aiConfig.phoneNumber.slice(-4)} 电话。
+                </p>
+              </div>
+
+              <button 
+                onClick={() => window.location.href = `tel:18585866935`}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-200 active:scale-95 transition-transform"
               >
-                拨打您的电话详谈
+                急需沟通？点此拨号联系规划师
               </button>
             </div>
           )
@@ -1141,26 +1169,48 @@ const handleCompanyClick = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="p-4 border-t border-gray-100 flex gap-3 bg-white">
-                    <button 
-                      onClick={() => {
-                        if (selectedProduct.isCustom) {
-                          window.location.href = 'tel:13800138000';
-                        } else {
-                          addToCart(selectedProduct); 
-                          alert('已加入购物车');
-                        }
-                      }}
-                      className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform"
-                    >
-                      {selectedProduct.isCustom ? '联系规划师' : '加入购物车'}
-                    </button>
-                    <button 
-                      onClick={() => { setRemarks(''); setSecondaryPage('checkout'); }}
-                      className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-xs font-bold shadow-md active:scale-95 transition-transform"
-                    >
-                      立即购买
-                    </button>
+                  <div className="p-4 border-t border-gray-100 flex gap-3 bg-white px-5">
+                    {selectedProduct.isCustom ? (
+                      <div className="flex w-full items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" 
+                            alt="Li Daming" 
+                            className="w-10 h-10 rounded-full object-cover shadow-sm"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">李大明</p>
+                            <p className="text-[10px] text-gray-400">行程规划师</p>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => window.location.href = 'tel:18585866935'}
+                          className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-3 rounded-xl text-xs font-bold shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center gap-2"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>联系他</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <button 
+                          onClick={() => {
+                            addToCart(selectedProduct); 
+                            alert('已加入购物车');
+                          }}
+                          className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl text-xs font-bold active:scale-95 transition-transform"
+                        >
+                          加入购物车
+                        </button>
+                        <button 
+                          onClick={() => { setRemarks(''); setSecondaryPage('checkout'); }}
+                          className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-xs font-bold shadow-md active:scale-95 transition-transform"
+                        >
+                          立即购买
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
