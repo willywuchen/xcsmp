@@ -306,7 +306,102 @@ export default function App() {
       )
     }]);
 
-    // Bot response start
+    // Check for "Demand Upgrade" trigger (10 days)
+    if (aiConfig.duration === '10天') {
+      // Stage 1: Feedback (Deep Mining)
+      setTimeout(() => {
+        setChatHistory(prev => [...prev, { 
+          type: 'bot', 
+          content: (
+            <div className="flex items-center gap-3 py-1">
+              <div className="relative w-5 h-5">
+                <motion.div 
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 border-2 border-blue-500 border-t-transparent rounded-full"
+                />
+              </div>
+              <span className="text-sm font-medium text-blue-600 animate-pulse">正在为您深度挖掘极致路线...</span>
+            </div>
+          ) 
+        }]);
+      }, 600);
+
+      // Stage 2: Reversal (Upgrade Announcement)
+      setTimeout(() => {
+        setChatHistory(prev => [...prev, { 
+          type: 'bot', 
+          content: (
+            <div className="space-y-3 py-1">
+              <div className="flex items-center gap-2 text-indigo-600">
+                <Award className="w-5 h-5 animate-bounce" />
+                <span className="text-sm font-black tracking-tight">需求升舱 · 专属通道已启动</span>
+              </div>
+              <p className="text-xs leading-relaxed text-gray-700 font-bold">
+                检测到您的需求极具独特性，AI 已自动为您接通<span className="text-indigo-600">【资深定制师】</span>绿色通道。专人专家为您手工编排。
+              </p>
+              <div className="h-0.5 w-full bg-indigo-50 overflow-hidden rounded-full">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 2 }}
+                  className="h-full bg-indigo-500"
+                />
+              </div>
+            </div>
+          ) 
+        }]);
+      }, 3000);
+
+      // Stage 3 & 4: Commitment & Final Promise
+      setTimeout(() => {
+        setChatHistory(prev => [...prev, { 
+          type: 'bot', 
+          content: (
+            <div className="space-y-4 py-1">
+              <div className="flex items-center gap-3 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                <div className="relative">
+                  <img 
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" 
+                    className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <div className="w-1 h-1 bg-white rounded-full animate-ping" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold text-gray-900">线路专家：李大明</p>
+                    <span className="text-[9px] text-green-600 font-bold bg-green-100 px-1.5 py-0.5 rounded uppercase">响应中</span>
+                  </div>
+                  <p className="text-[9px] text-gray-400 mt-0.5 whitespace-nowrap overflow-hidden">正在从库中调取私藏路线进行手工编排</p>
+                </div>
+              </div>
+
+              <p className="text-[12px] text-gray-700 leading-relaxed font-medium">
+                专家大明正在为您深度定制行程，预计<span className="text-blue-600 font-black px-1.5 bg-blue-50 rounded mx-0.5 whitespace-nowrap">30分钟内</span>会与您取得联系。请留意接听电话，惊喜行程即将为您送达。
+              </p>
+
+              <button 
+                onClick={() => window.location.href = `tel:18585866935`}
+                className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-100 active:scale-95 transition-transform flex items-center justify-center gap-2"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>急需沟通？点此直接联系</span>
+              </button>
+            </div>
+          ) 
+        }]);
+        setTimeout(() => {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }, 100);
+      }, 6000);
+
+      return;
+    }
+
+    // Standard Bot response flow
     setTimeout(() => {
       setChatHistory(prev => [...prev, { 
         type: 'bot', 
@@ -1650,7 +1745,7 @@ const handleCompanyClick = () => {
                       value={aiConfig.duration}
                       onChange={(e) => setAiConfig({...aiConfig, duration: e.target.value})}
                     >
-                      {[1,2,3,4,5,6,7].map(d => (
+                      {[1,2,3,4,5,6,7,8,9,10].map(d => (
                         <option key={d} value={`${d}天`}>{d}天</option>
                       ))}
                     </select>
